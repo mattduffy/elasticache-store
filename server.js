@@ -6,7 +6,6 @@ const express = require('express')
   , morgan = require('morgan')
   , mongoose = require('mongoose')
   , cfg = require('./config')
-  , User = require('./models/user.js')
   ;
 
 
@@ -17,6 +16,10 @@ mongoose.connect(cfg.DBUrl2, (err)=>{
     console.info("connected to the database.");
   }
 });
+
+const User = require('./models/user.js');
+
+
 // middle wares
 app.use(morgan('dev'));
 app.use(bodyParser.json());
@@ -35,6 +38,21 @@ app.post('/create-user', (req, res, next)=>{
   user.save((err)=>{
     if(err) next(err);
     res.json("successfully added a new user");
+  });
+});
+
+app.post('/login', (req, res, next)=>{
+  let password = req.body.password;
+  let id = req.body.id;
+  // 56da4a075aedff11db08c157
+  User.findOne({id: id}, (err, result)=>{
+    if(err){
+      console.log("no user found with that id" );
+      res.json({err: '404', msg:'No user found with id: ', id});
+    } else {
+      console.log(result);
+      res.json(result);
+    }
   });
 });
 
