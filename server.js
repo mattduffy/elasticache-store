@@ -27,7 +27,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 // routes
 app.get('/', (req, res, next)=>{
-  res.json("faggot faggot faggot");
+  res.json("froggy froggy froggy");
 });
 
 app.post('/create-user', (req, res, next)=>{
@@ -44,13 +44,17 @@ app.post('/create-user', (req, res, next)=>{
 app.post('/login', (req, res, next)=>{
   let password = req.body.password;
   let id = req.body.id;
-  // 56da4a075aedff11db08c157
-  User.findOne({id: id}, (err, result)=>{
+  console.log(req.body);
+  // let id = new mongoose.Types.ObjectId(req.body.id);
+  // let id = '56da4a075aedff11db08c157' // db.users
+  // let id = '56dc9413033b51aff34b9982' // db.User
+  //User.findOne({id: id}, (err, result)=>{
+  User.findById(id, (err, result)=>{
     if(err){
-      console.log("no user found with that id" );
-      res.json({err: '404', msg:'No user found with id: ', id});
+      console.log("db error occurred" );
+      res.json({err: '404', msg:'DB error: ', err});
     } else {
-      console.log(result);
+      console.log("user: ", result);
       res.json(result);
     }
   });

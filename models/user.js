@@ -17,8 +17,10 @@ var UserSchema = new mongoose.Schema({
     paid: {type: Number, default: 0}
     // item: {type: Schema.Types.ObjectId, ref: ''}
   }]
-});
-
+}, {collection: 'User'});
+/* strange bug in 4.x.x+ version of mongoose where it silently changes the
+collection name from User to users when it compiles the schema.  Can force
+mongoose to use the User collection by passing optional obj argument. */
 
 /* Hash the password before we save it to the DB. */
 UserSchema.pre('save', function(next){
@@ -39,4 +41,4 @@ UserSchema.methods.comparePassword = (password)=>{
   return bcrypt.compare(password, this.password)
 };
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model('User', UserSchema, 'User'); // see commet above about schema compile bug in mongoose.
