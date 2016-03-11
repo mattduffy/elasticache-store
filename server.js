@@ -36,8 +36,12 @@ app.post('/create-user', (req, res, next)=>{
   user.password = req.body.password;
   user.email = req.body.email;
   user.save((err)=>{
-    if(err) next(err);
-    res.json("successfully added a new user");
+    if(err) {
+      next(err);
+    } else {
+      console.log(this);
+      res.json("successfully added a new user");
+    }
   });
 });
 
@@ -54,8 +58,13 @@ app.post('/login', (req, res, next)=>{
       console.log("db error occurred" );
       res.json({err: '404', msg:'DB error: ', err});
     } else {
-      console.log("user: ", result);
-      res.json(result);
+      let user = new User(result);
+      console.log("user found: ", user);
+      if(user.comparePassword(password)){
+        res.json(result);
+      } else {
+        res.json({'msg': "nice try bucko."});
+      }
     }
   });
 });

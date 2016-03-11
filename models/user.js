@@ -38,7 +38,17 @@ UserSchema.pre('save', function(next){
 
 /* Compare user submitted password with cryptographic hash stored in DB. */
 UserSchema.methods.comparePassword = (password)=>{
-  return bcrypt.compare(password, this.password)
+  console.log(password);
+  console.log(this.password);
+  return bcrypt.compare(password, this.password, (err, result)=>{
+    if(err) {
+      console.log("bcrypt compare error: ", err, password);
+      return false;
+    } else {
+      console.log("bcrypt compare: ", result);
+      return result;
+    }
+  });
 };
 
 module.exports = mongoose.model('User', UserSchema, 'User'); // see commet above about schema compile bug in mongoose.
