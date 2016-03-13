@@ -38,9 +38,10 @@ UserSchema.pre('save', function(next){
 
 /* Compare user submitted password with cryptographic hash stored in DB. */
 UserSchema.methods.comparePassword = (password)=>{
-  console.log(password);
-  console.log(this.password);
-  return bcrypt.compare(password, this.password, (err, result)=>{
+  console.log(typeof password, ": ", password);
+  console.log(typeof this.password), ": ", this.password;
+  console.log(this);
+  return bcrypt.compare(password, this.password || '', (err, result)=>{
     if(err) {
       console.log("bcrypt compare error: ", err, password);
       return false;

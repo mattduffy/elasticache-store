@@ -6,6 +6,13 @@ const express = require('express')
   , morgan = require('morgan')
   , mongoose = require('mongoose')
   , cfg = require('./config')
+  , ejs = require('ejs')
+  , engine = require('ejs-mate')
+  , session = require('express-session')
+  , cookieParser = require('cookie-parser')
+  , flash = require('express-flash')
+  , MongoStore = require('connect-mongo')(session)
+  , passport = require('passport')
   ;
 
 
@@ -20,53 +27,43 @@ mongoose.connect(cfg.DBUrl2, (err)=>{
 const User = require('./models/user.js');
 
 
-// middle wares
+// 3rd party middlewares
+app.use(express.static(__dirname +'/public'));
+app.use(cookieParser());
+app.use(session({
+  resave: false,
+  saveUninitialized: false,
+  secret: "super secrete security stuff",
+  store: new MongoStore({url: cfg.DBUrl2, autoReconnect: true})
+}));
+app.use(flash());
 app.use(morgan('dev'));
 app.use(bodyParser.json());
+app.use(bodyParser.text({type: 'text/*'}));
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+// my custom middlewares
+
+// express app settings
+app.engine('ejs', engine);
+app.set('view engine', 'ejs');
+app.set('views', __dirname + '/views');
+app.disable('x-powered-by');
+app.locals.app = {name: "My Amazon clone"};
 
 // routes
-app.get('/', (req, res, next)=>{
-  res.json("froggy froggy froggy");
-});
+var mainRoutes = require('./routes/main');
+app.use(mainRoutes);
 
-app.post('/create-user', (req, res, next)=>{
-  let user = new User();
-  user.profile.name = req.body.name;
-  user.password = req.body.password;
-  user.email = req.body.email;
-  user.save((err)=>{
-    if(err) {
-      next(err);
-    } else {
-      console.log(this);
-      res.json("successfully added a new user");
-    }
-  });
-});
+var userRoutes = require('./routes/user');
+app.use(userRoutes);
 
-app.post('/login', (req, res, next)=>{
-  let password = req.body.password;
-  let id = req.body.id;
-  console.log(req.body);
-  // let id = new mongoose.Types.ObjectId(req.body.id);
-  // let id = '56da4a075aedff11db08c157' // db.users
-  // let id = '56dc9413033b51aff34b9982' // db.User
-  //User.findOne({id: id}, (err, result)=>{
-  User.findById(id, (err, result)=>{
-    if(err){
-      console.log("db error occurred" );
-      res.json({err: '404', msg:'DB error: ', err});
-    } else {
-      let user = new User(result);
-      console.log("user found: ", user);
-      if(user.comparePassword(password)){
-        res.json(result);
-      } else {
-        res.json({'msg': "nice try bucko."});
-      }
-    }
-  });
+// Keep this middleware function at the bottom of the list of routes/middleware
+// to act as the fall through action for 404 - Not Found situations.
+app.use(function(req, res, next) {
+  res.status(404).send('Sorry cant find that!');
 });
 
 // server app config
