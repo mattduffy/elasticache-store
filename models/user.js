@@ -1,6 +1,7 @@
 'use strict';
 const mongoose = require('mongoose')
   , bcrypt = require('bcrypt-nodejs')
+  , crypto = require('crypto')
   ;
 
 /* The user schema attributes / characteristics / fields */
@@ -45,6 +46,13 @@ UserSchema.methods.comparePassword = (password)=>{
     same = err;
   }
   return same;
+};
+
+UserSchema.methods.gravatar = (size)=>{
+  if(!size) this.size = 200;
+  if(!this.email) return 'https://gravatar.com/avatar/?s=' + this.size + '&d=retro';
+  var md4 = crypto.createHash('md5').update(this.email).digest('hex');
+  return 'https://gravatar.com/avatar/' + md5 + '?s=' + this.size + '&d=retro';
 };
 
 module.exports = mongoose.model('User', UserSchema, 'User'); // see commet above about schema compile bug in mongoose.

@@ -10,6 +10,16 @@
         <%= messages %>
       </div>
     <% } %>
-    Hello, <%= user.profile.name %>
+    <div class="row">
+      <div class="col-sm-6 col-md-4">
+        <img class="img-circle img-responsive img-center" src="<%= user.profile.picture %>" alt="">
+
+        <p>Name: <%= user.profile.name %></p>
+        <p>Email: <%= user.email %></p>
+        <p>Address: <%= user.address || "Not given." %></p>
+
+        <a href="/edit-profile" class="btn btn-primary btn-lg">Edit</a>
+      </div>
+    </div>
   </div>
 </div>

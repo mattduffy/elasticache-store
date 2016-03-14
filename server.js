@@ -45,6 +45,10 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // my custom middlewares
+app.use((req, res, next)=>{
+  res.locals.user = req.user;
+  next();
+});
 
 // express app settings
 app.engine('ejs', engine);
