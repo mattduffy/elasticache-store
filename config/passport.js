@@ -19,17 +19,17 @@ passport.use('local-login', new localStrategy({
   passwordField: "password",
   passReqToCallback: true
   }, (req, email, password, done)=>{
-    console.log("inside passport local-login: ", email);
-    User.findOne({email: email}, (err, user)=>{
-      if (err) return done(err);
-
-      if (!user) {
+    User.findOne({email: email}, (err, found)=>{
+      if (err) {
+        return done(err);
+      } else if (!found) {
         return done(null, false, req.flash("loginMessage", "No user found for " + email));
-      }
-      if (!user.comparePassword(password)) {
+      } else if (!found.comparePassword(password)) {
         return done(null, false, req.flash("loginMessage", "Oops, wrong password, pal."));
+      } else {
+        return done(null, found, req.flash("loginMessage", "You are logged in as: " + email));
       }
-      return done(null, user, req.flash("loginMessage", "You are logged in as: " + email));
+      console.log("fell out of auth if/then in local-login localStrategy.");
     });
   })
 );

@@ -38,7 +38,6 @@ router.post('/signup', (req, res, next)=>{
 router.get('/profile', (req, res, next)=>{
   // req.flash('profile', "No profile page exists yet.");
   // res.redirect('/');
-  console.warn('bussy putthole');
   res.json(req.user);
 
 });
@@ -49,10 +48,13 @@ router.get('/login', (req, res, next)=>{
   res.render('accounts/login', {
     app: app,
     title: "Clonie Login",
-    message: req.flash('loginMessage')});
+    messages: req.flash('loginMessage')});
 });
 
-router.post('/login', passport.authenticate('local-login', {
+router.post('/login', (req, res, next)=>{
+  //console.log("body parser stuff: ", req.body.password);
+  next();
+}, passport.authenticate('local-login', {
   successRedirect: '/profile',
   failureRedirect: '/login',
   failureFlash: true
