@@ -36,14 +36,23 @@ router.post('/signup', (req, res, next)=>{
 });
 
 router.get('/profile', (req, res, next)=>{
-  // req.flash('profile', "No profile page exists yet.");
-  // res.redirect('/');
-  res.json(req.user);
-
+  if (req.user) {
+    let app = req.app.locals.app;
+    User.findOne({_id: req.user._id}, (err, found)=>{
+      if(err) return next(err);
+      res.render('accounts/profile', {
+        user: found,
+        app: app,
+        title: "My Clonie Profile",
+        messages: req.flash('profile')});
+    });
+  }
 });
 
 router.get('/login', (req, res, next)=>{
-  if(req.user) return res.redirect('/');
+  if(req.user) {
+    return res.redirect('/profile');
+  }
   let app = res.app.locals.app;
   res.render('accounts/login', {
     app: app,
