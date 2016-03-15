@@ -7,12 +7,14 @@ const express = require('express')
   , mongoose = require('mongoose')
   , cfg = require('./config')
   , ejs = require('ejs')
+  // , engine = require('ejs-locals')
   , engine = require('ejs-mate')
   , session = require('express-session')
   , cookieParser = require('cookie-parser')
   , flash = require('express-flash')
   , MongoStore = require('connect-mongo')(session)
   , passport = require('passport')
+  , Category = require('./models/category')
   ;
 
 
@@ -46,9 +48,22 @@ app.use(passport.session());
 
 // my custom middlewares
 app.use((req, res, next)=>{
-  res.locals.user = req.user;
+  res.locals.user = (req.user) ? res.user : null;
+  Category.find({}, (err, categories)=>{
+    if(err) return next(err);
+    res.locals.prod_categories = categories;
+    console.log("middleware set res categories ", res.locals.categories);
+  });
   next();
 });
+// app.use((req,res,next)=>{
+//   Category.find({}, (err, categories)=>{
+//     if(err) return next(err);
+//     res.locals.categories = categories;
+//     next();
+//   })
+//   next();
+// });
 
 // express app settings
 app.engine('ejs', engine);
@@ -58,11 +73,21 @@ app.disable('x-powered-by');
 app.locals.app = {name: "My Amazon clone"};
 
 // routes
+app.all('*', (req,res,next)=>{
+  Category.find({}, (err, categories)=>{
+    if(err) return next(err);
+    res.locals.categories = categories;
+    next();
+  });
+});
 var mainRoutes = require('./routes/main');
 app.use(mainRoutes);
 
 var userRoutes = require('./routes/user');
 app.use(userRoutes);
+
+var adminRoutes = require('./routes/admin');
+app.use('/admin', adminRoutes);
 
 // Keep this middleware function at the bottom of the list of routes/middleware
 // to act as the fall through action for 404 - Not Found situations.

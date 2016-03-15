@@ -18,15 +18,11 @@
         <%= errors %>
       </div>
     <% } %>
-    <h2>Login</h2>
-    <form method="post" action="/login">
+    <h2>Add a new product category</h2>
+    <form method="post" action="/admin/add-category">
       <div class="form-group">
-        <label for="email">Email Address</label>
-        <input type="email" class="form-control" name="email" id="email">
-      </div>
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" class="form-control" name="password" id="password">
+        <label for="name">Name</label>
+        <input type="name" class="form-control" name="name" id="name" value="">
       </div>
       <button type="submit" class="btn btn-success">Submit</button>
     </form>

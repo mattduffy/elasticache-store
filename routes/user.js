@@ -8,7 +8,8 @@ const router = require('express').Router()
 router.get('/signup', (req, res, next)=>{
   res.render('accounts/signup', {
     title: "create a new user",
-    errors: req.flash('errors')
+    errors: req.flash('errors'),
+    successes: req.flash('success')
   });
 });
 router.post('/signup', (req, res, next)=>{
@@ -44,17 +45,15 @@ router.post('/signup', (req, res, next)=>{
 router.get('/profile', (req, res, next)=>{
   if (req.user) {
     let app = req.app.locals.app;
-    let messages = [];
-    messages.push(req.flash('loginMessages'));
-    messages.push(req.flash('success'));
-    console.log(messages);
     User.findOne({_id: req.user._id}, (err, found)=>{
       if(err) return next(err);
       res.render('accounts/profile', {
         user: found,
         app: app,
         title: "My Clonie Profile",
-        messages: messages});
+        errors: req.flash('loginMessages'),
+        successes: req.flash('success')
+      });
     });
   }
 });
@@ -64,13 +63,12 @@ router.get('/login', (req, res, next)=>{
     return res.redirect('/profile');
   }
   let app = res.app.locals.app;
-  let messages = [];
-  messages.push(req.flash('loginMessages'));
-  messages.push(req.flash('success'));
   res.render('accounts/login', {
     app: app,
     title: "Clonie Login",
-    messages: messages});
+    errors: req.flash('loginMessages'),
+    successes: req.flash('success')
+  });
 });
 
 router.get('/edit-profile', (req, res, next)=>{
@@ -79,7 +77,9 @@ router.get('/edit-profile', (req, res, next)=>{
     app: app,
     user: req.user,
     title: "Edit my profile",
-    messages: req.flash('success')});
+    errors: req.flash('loginMessages'),
+    successes: req.flash('success')
+  });
 });
 
 router.post('/edit-profile', (req, res, next)=>{
