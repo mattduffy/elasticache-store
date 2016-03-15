@@ -1,0 +1,36 @@
+<% layout('layout') -%>
+
+<div class="row">
+  <div class="col-lg-6 col-md-offset-3">
+    <% if(successes.length > 0) { %>
+      <div class="alert alert-success alert-dismissible">
+        <button type=button class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <%= successes %>
+      </div>
+    <% } %>
+    <% if(errors.length > 0) { %>
+      <div class="alert alert-danger alert-dismissible">
+        <button type=button class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <%= errors %>
+      </div>
+    <% } %>
+    <div class="row">
+      <div class="col-sm-6 col-md-5">
+        <% if('undefined' != thisCategory && null != thisCategory) { %>
+          <h2>Category</h2>
+          <p><%= thisCategory.name %></p>
+        <% } else { %>
+        <h2>Clonie Categories</h2>
+        <% for(var i=0; i < categories.length; i++) { %>
+          <li><a href="/category/<%= categories[i].name %>"><%= categories[i].name %></a>
+          <a href="/admin/edit-category/<%= categories[i].name %>" class="btn btn-primary btn-lg">Edit</a></li>
+        <% } %>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>

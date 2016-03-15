@@ -4,10 +4,10 @@ const mongoose = require('mongoose')
   ;
 
 var ProductSchema = new Schema({
-  category: {type: Schema.types.ObjectId, ref: 'Category'},
+  category: {type: Schema.Types.ObjectId, ref: 'Category'},
   name: String,
   price: Number,
   image: String
-});
+}, {collection: 'Product'});
 
-module.exports = mongoose.model('Product', ProductSchema, {collection: 'Product'});
+module.exports = mongoose.model('Product', ProductSchema);

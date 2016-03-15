@@ -89,6 +89,9 @@ app.use(userRoutes);
 var adminRoutes = require('./routes/admin');
 app.use('/admin', adminRoutes);
 
+var apiRoutes = require('./api/api');
+app.use('/api', apiRoutes);
+
 // Keep this middleware function at the bottom of the list of routes/middleware
 // to act as the fall through action for 404 - Not Found situations.
 app.use(function(req, res, next) {
