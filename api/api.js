@@ -2,6 +2,7 @@
 const router = require('express').Router()
   , async = require('async')
   , faker = require('faker')
+  , mongoose = require('mongoose')
   , Category = require('../models/category')
   , Product = require('../models/product')
   ;
@@ -17,7 +18,8 @@ router.get('/:name', (req,res,next)=>{
     (category, callback)=>{
       for(var i=0; i<30; i++){
         var product = new Product();
-        product.category = category._id;
+        console.log(new mongoose.Types.ObjectId);
+        product.category = new mongoose.Types.ObjectId(category._id);
         product.name = faker.commerce.productName();
         product.price = faker.commerce.price();
         product.image = faker.image.image();

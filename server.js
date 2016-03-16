@@ -49,11 +49,10 @@ app.use(passport.session());
 // my custom middlewares
 app.use((req, res, next)=>{
   res.locals.user = (req.user) ? res.user : null;
-  Category.find({}, (err, categories)=>{
-    if(err) return next(err);
-    res.locals.prod_categories = categories;
-    console.log("middleware set res categories ", res.locals.categories);
-  });
+  // Category.find({}, (err, categories)=>{
+  //   if(err) return next(err);
+  //   res.locals.prod_categories = categories;
+  // });
   next();
 });
 // app.use((req,res,next)=>{
