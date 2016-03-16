@@ -18,7 +18,6 @@ router.get('/:name', (req,res,next)=>{
     (category, callback)=>{
       for(var i=0; i<30; i++){
         var product = new Product();
-        console.log(new mongoose.Types.ObjectId);
         product.category = new mongoose.Types.ObjectId(category._id);
         product.name = faker.commerce.productName();
         product.price = faker.commerce.price();

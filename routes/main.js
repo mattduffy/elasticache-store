@@ -4,7 +4,27 @@ const router = require('express').Router()
   , Product = require('../models/product')
   ;
 
+Product.createMapping((err, mapping)=>{
+  if(err) {
+    console.log("error creating ES mapping");
+    console.trace(err);
+  } else {
+    console.log("mapping created.");
+    console.log(mapping);
+  }
+});
 
+var stream = Product.synchronize();
+var count = 0;
+stream.on('data', ()=>{
+  count++;
+});
+stream.on('close', ()=>{
+  console.log("Indexed " + count + " documents.");
+});
+stream.on('error', (err)=>{
+  console.log(err);
+});
 
 router.get('/', (req, res, next)=>{
   let app = res.app.locals.app;
@@ -18,20 +38,7 @@ router.get('/about', (req, res, next)=>{
   res.render('main/about', {title: "About us"})
 });
 
-// router.get('/products/:_id', (req,res,next)=>{
-//   Product
-//   .find({category: req.params._id}, (err, products)=>{
-//     if(err) return next(err);
-//     res.render('main/category', {
-//       title: "Category " + req.params._id,
-//       products: products,
-//       errors: req.flash('error'),
-//       messages: req.flash('message'),
-//       successes: req.flash('success')
-//     });
-//   });
-// });
-router.get('/products/:id', function(req,res,next){
+router.get('/products/:id', (req,res,next)=>{
   let p = Product
   .find({ category: req.params.id })
   .populate('category');
@@ -45,6 +52,19 @@ router.get('/products/:id', function(req,res,next){
       successes: req.flash('success')
     });
   })
+});
+
+router.get('/product/:id', (req,res,next)=>{
+  Product.findById({_id: req.params.id}, (err, product)=>{
+    if(err) return next(err);
+    res.render('main/product', {
+      product: product,
+      title: "Clonie: " + product.name,
+      errors: req.flash('error'),
+      messages: req.flash('message'),
+      successes: req.flash('success')
+    });
+  });
 });
 
 router.get('/category', (req,res,next)=>{
