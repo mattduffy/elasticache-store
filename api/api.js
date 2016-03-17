@@ -8,7 +8,7 @@ const router = require('express').Router()
   ;
 
 router.post('/search',(req,res,next)=>{
-  console.log(req.body.search_term);
+  // console.log(req.body.search_term);
   Product.search({
     query_string: {query: req.body.search_term}
   }, (err, result)=>{
