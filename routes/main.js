@@ -14,6 +14,27 @@ Product.createMapping((err, mapping)=>{
   }
 });
 
+function paginate(req,res,next){
+  let perPage = 9;
+  let page = req.params.page || 1;
+  let p = Product
+    .find()
+    .skip(perPage * page)
+    .limit(perPage)
+    .populate('category');
+  p.exec((err, products)=>{
+    if(err) return next(err);
+    Product.count().exec((err, num)=>{
+      if(err) return next(err);
+      res.render('main/product-main', {
+        title: "Clonie stuff",
+        products: products,
+        pages: num / perPage
+      });
+    });
+  });
+}
+
 var stream = Product.synchronize();
 var count = 0;
 stream.on('data', ()=>{
@@ -26,14 +47,46 @@ stream.on('error', (err)=>{
   console.log(err);
 });
 
+router.post('/search',(req,res,next)=>{
+  res.redirect('/search?q='+req.body.q);
+});
+
+router.get('/search',(req,res,next)=>{
+  if(req.query.q){
+    Product.search({
+      query_string: {query: req.query.q}
+    },(err, result)=>{
+      if(err) return next(err);
+      var data = result.hits.hits.map((hit)=>{
+        return hit;
+      });
+      res.render('main/search-result', {
+        title: "Search Results",
+        query: req.query.q,
+        data: data
+      });
+    });
+  }
+});
+
 router.get('/', (req, res, next)=>{
   let app = res.app.locals.app;
-  res.render('main/home', {
-    'title': 'Clonie and me',
-    app: app,
-    profile: req.flash('profile')
-  });
+  if(req.user){
+    paginate(req,res,next);
+  } else {
+    res.render('main/home', {
+      title: 'Clonie and me',
+      app: app,
+      profile: req.flash('profile')
+    });
+  }
 });
+
+router.get('/page/:page', (req, res, next)=>{
+  let app = res.app.locals.app;
+  paginate(req,res,next);
+});
+
 router.get('/about', (req, res, next)=>{
   res.render('main/about', {title: "About us"})
 });

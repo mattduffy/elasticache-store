@@ -7,6 +7,16 @@ const router = require('express').Router()
   , Product = require('../models/product')
   ;
 
+router.post('/search',(req,res,next)=>{
+  console.log(req.body.search_term);
+  Product.search({
+    query_string: {query: req.body.search_term}
+  }, (err, result)=>{
+    if(err) return next(err);
+    res.json(result);
+  });
+});
+
 router.get('/:name', (req,res,next)=>{
   async.waterfall([
     (callback)=>{
