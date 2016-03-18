@@ -3,6 +3,8 @@ const router = require('express').Router()
   , User = require('../models/user')
   , passport = require('passport')
   , passportCfg = require('../config/passport')
+  , async = require('async')
+  , Cart = require('../models/cart.js')
   ;
 
 router.get('/signup', (req, res, next)=>{
@@ -13,33 +15,39 @@ router.get('/signup', (req, res, next)=>{
   });
 });
 router.post('/signup', (req, res, next)=>{
-  console.log(req.body);
-  let user = new User();
-  user.profile.name = req.body.name;
-  user.password = req.body.password;
-  user.email = req.body.email;
-  user.profile.picture = user.gravatar();
-  User.findOne({email: req.body.email}, (err, existingUser)=>{
-    if(existingUser){
-      //console.log(req.body.email , " already exists in the db.");
-      req.flash('errors', "Account with that email address already exists.");
-      return res.redirect('/signup');
-    } else {
-      user.save((err)=>{
-        if(err) {
-          return next(err);
+  // console.log(req.body);
+  async.waterfall([
+    ((callback)=>{
+      let user = new User();
+      user.profile.name = req.body.name;
+      user.password = req.body.password;
+      user.email = req.body.email;
+      user.profile.picture = user.gravatar();
+      User.findOne({email: req.body.email}, (err, existingUser)=>{
+        if(existingUser){
+          //console.log(req.body.email , " already exists in the db.");
+          req.flash('errors', "Account with that email address already exists.");
+          return res.redirect('/signup');
         } else {
-          req.logIn(user, (error)=>{
-            if(error) {
-              return next(error);
-            } else {
-              res.redirect('/profile');
-            }
+          user.save((err)=>{
+            if(err) return next(err);
+            callback(null, user);
           });
         }
       });
-    }
-  });
+    }),
+    ((user)=>{
+      let cart = new Cart();
+      cart.owner = user._id;
+      cart.save((err)=>{
+        if(err) return next(err);
+        req.logIn(user, (error)=>{
+          if(error) return next(error);
+          res.redirect('/profile');
+        });
+      });
+    })
+  ]);
 });
 
 router.get('/profile', (req, res, next)=>{

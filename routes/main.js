@@ -2,6 +2,7 @@
 const router = require('express').Router()
   , Category = require('../models/category')
   , Product = require('../models/product')
+  , Cart = require('../models/cart')
   ;
 
 Product.createMapping((err, mapping)=>{
@@ -55,7 +56,7 @@ router.get('/search',(req,res,next)=>{
   if(req.query.q){
     Product.search({
       query_string: {query: req.query.q}
-    },(err, result)=>{
+    }, {hydrate: true, hydrateOptions: {lean: false}}, (err, result)=>{
       if(err) return next(err);
       var data = result.hits.hits.map((hit)=>{
         return hit;
@@ -75,6 +76,7 @@ router.get('/', (req, res, next)=>{
     paginate(req,res,next);
   } else {
     res.render('main/home', {
+      //user: res.local.user,
       title: 'Clonie and me',
       app: app,
       profile: req.flash('profile')
@@ -116,6 +118,22 @@ router.get('/product/:id', (req,res,next)=>{
       errors: req.flash('error'),
       messages: req.flash('message'),
       successes: req.flash('success')
+    });
+  });
+});
+
+router.post('/product/:product_id',(req,res,next)=>{
+  Cart.findOne({owner: req.user._id}, (err, cart)=>{
+    if(err) return next(err);
+    cart.items.push({
+      item: req.body.product_id,
+      price: parseFloat(req.body.priceValue),
+      quantity: parseInt(req.body.quantity)
+    });
+    cart.total = (cart.total + parseFloat(req.body.priceValue)).toFixed(2);
+    cart.save((err)=>{
+      if(err) return next(err);
+      return res.redirect('/cart');
     });
   });
 });

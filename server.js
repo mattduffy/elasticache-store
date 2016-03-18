@@ -15,6 +15,7 @@ const express = require('express')
   , MongoStore = require('connect-mongo')(session)
   , passport = require('passport')
   , Category = require('./models/category')
+  , cartLength = require('./middleware/middleware')
   ;
 
 
@@ -48,21 +49,11 @@ app.use(passport.session());
 
 // my custom middlewares
 app.use((req, res, next)=>{
-  res.locals.user = (req.user) ? res.user : null;
-  // Category.find({}, (err, categories)=>{
-  //   if(err) return next(err);
-  //   res.locals.prod_categories = categories;
-  // });
+  res.locals.user = (req.user) ? res.user : {name:"mark"};
+  console.log('middleware add user to res.local: ', res.locals.user);
   next();
 });
-// app.use((req,res,next)=>{
-//   Category.find({}, (err, categories)=>{
-//     if(err) return next(err);
-//     res.locals.categories = categories;
-//     next();
-//   })
-//   next();
-// });
+app.use(cartLength);
 
 // express app settings
 app.engine('ejs', engine);
@@ -75,10 +66,12 @@ app.locals.app = {name: "My Amazon clone"};
 app.all('*', (req,res,next)=>{
   Category.find({}, (err, categories)=>{
     if(err) return next(err);
+    //res.locals.user = (req.user) ? res.user : undefined;
     res.locals.categories = categories;
     next();
   });
 });
+
 var mainRoutes = require('./routes/main');
 app.use(mainRoutes);
 
