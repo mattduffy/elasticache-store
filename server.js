@@ -47,14 +47,6 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(passport.initialize());
 app.use(passport.session());
 
-// my custom middlewares
-app.use((req, res, next)=>{
-  res.locals.user = (req.user) ? res.user : {name:"mark"};
-  console.log('middleware add user to res.local: ', res.locals.user);
-  next();
-});
-app.use(cartLength);
-
 // express app settings
 app.engine('ejs', engine);
 app.set('view engine', 'ejs');
@@ -62,15 +54,22 @@ app.set('views', __dirname + '/views');
 app.disable('x-powered-by');
 app.locals.app = {name: "My Amazon clone"};
 
+// my custom middlewares
+app.use(function(req,res,next){
+  res.locals.user = req.user;
+  next();
+});
+app.use(cartLength);
+
 // routes
 app.all('*', (req,res,next)=>{
   Category.find({}, (err, categories)=>{
     if(err) return next(err);
-    //res.locals.user = (req.user) ? res.user : undefined;
     res.locals.categories = categories;
     next();
   });
 });
+
 
 var mainRoutes = require('./routes/main');
 app.use(mainRoutes);

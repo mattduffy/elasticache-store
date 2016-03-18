@@ -79,6 +79,20 @@ router.get('/login', (req, res, next)=>{
   });
 });
 
+router.post('/login', (req, res, next)=>{
+  //console.log("body parser stuff: ", req.body.password);
+  next();
+}, passport.authenticate('local-login', {
+  successRedirect: '/profile',
+  failureRedirect: '/login',
+  failureFlash: true
+}));
+
+router.get('/logout', (req, res, next)=>{
+  req.logout();
+  res.redirect('/');
+});
+
 router.get('/edit-profile', (req, res, next)=>{
   let app = res.app.locals.app;
   res.render('accounts/edit-profile', {
@@ -101,20 +115,6 @@ router.post('/edit-profile', (req, res, next)=>{
       res.redirect('/profile');
     });
   });
-});
-
-router.post('/login', (req, res, next)=>{
-  //console.log("body parser stuff: ", req.body.password);
-  next();
-}, passport.authenticate('local-login', {
-  successRedirect: '/profile',
-  failureRedirect: '/login',
-  failureFlash: true
-}));
-
-router.get('/logout', (req, res, next)=>{
-  req.logout();
-  res.redirect('/');
 });
 
 module.exports = router;
