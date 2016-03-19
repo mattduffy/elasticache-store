@@ -15,7 +15,7 @@ Product.createMapping((err, mapping)=>{
   }
 });
 
-function paginate(req,res,next){
+var paginate = (req,res,next)=>{
   let perPage = 9;
   let page = req.params.page || 1;
   let p = Product

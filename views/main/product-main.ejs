@@ -37,10 +37,10 @@
       <% } %>
       <ul class="pagination text-center">
         <% for(var i=1; i<=pages; i++) { %>
-          <% if(1 == i) { %>
-            <li class=""><a href="/<%= i %>" class=""><%= i %></a></li>
-          <% } else if(i == page) { %>
+          <% if(i == page) { %>
             <li class=""><a class=""><u><b><%= i %></b></u></a></li>
+          <% } else if(i == 1) { %>
+              <li class=""><a href="/" class=""><%= i %></a></li>
           <% } else { %>
             <li class=""><a href="/page/<%= i %>" class=""><%= i %></a></li>
           <% } %>
