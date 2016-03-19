@@ -90,6 +90,7 @@ router.post('/login', (req, res, next)=>{
 
 router.get('/logout', (req, res, next)=>{
   req.logout();
+  // req.cart = null;
   res.redirect('/');
 });
 

@@ -16,7 +16,7 @@ $(function(){
         var html = '';
         for(var i=0; i<data.length; i++){
           html += '<div class="col-md-4">';
-          html += '<a href="/product/'+ data[i]._source._id +'">';
+          html += '<a href="/product/'+ data[i]._id +'">';
           html += '<div class="thumbnail">';
           html += '<img src='+ data[i]._source.image +'>';
           html += '<div class="caption">';
@@ -32,4 +32,29 @@ $(function(){
       }
     })
   })
+});
+
+$(document).on('click', '#plus', function(e){
+  e.preventDefault();
+  var priceValue = parseFloat($('#priceValue').val());
+  var quantity = parseInt($('#quantity').val());
+  priceValue += parseFloat($('#priceHidden').val());
+  quantity += 1;
+  $('#quantity').val(quantity);
+  $('#priceValue').val(parseFloat(priceValue).toFixed(2));
+  $('#total').html(quantity);
+});
+$(document).on('click', '#minus', function(e){
+  e.preventDefault();
+  var quantity = parseInt($('#quantity').val());
+  if(1 == quantity) {
+    console.log("can't order negative number of product");
+    return;
+  }
+  var priceValue = parseFloat($('#priceValue').val());
+  priceValue -= parseFloat($('#priceHidden').val());
+  quantity -= 1;
+  $('#quantity').val(quantity);
+  $('#priceValue').val(parseFloat(priceValue).toFixed(2));
+  $('#total').html(quantity);
 });

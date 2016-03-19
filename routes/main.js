@@ -30,7 +30,8 @@ function paginate(req,res,next){
       res.render('main/product-main', {
         title: "Clonie stuff",
         products: products,
-        pages: num / perPage
+        pages: num / perPage,
+        page: page
       });
     });
   });
@@ -123,17 +124,50 @@ router.get('/product/:_id', (req,res,next)=>{
 });
 
 router.post('/product/:product_id',(req,res,next)=>{
-  Cart.findOne({owner: req.user._id}, (err, cart)=>{
-    if(err) return next(err);
-    cart.items.push({
-      item: req.body.product_id,
-      price: parseFloat(req.body.priceValue),
-      quantity: parseInt(req.body.quantity)
-    });
-    cart.total = (cart.total + parseFloat(req.body.priceValue)).toFixed(2);
-    cart.save((err)=>{
+  let c = Cart
+    .findOne({owner: req.user._id})
+    .populate('items.item');
+    c.exec((err, foundCart)=>{
       if(err) return next(err);
-      return res.redirect('/cart');
+      let item = {
+        item: req.body.product_id,
+        price: parseFloat(req.body.priceValue),
+        quantity: parseInt(req.body.quantity)
+      };
+      foundCart.items.push(item);
+      foundCart.total = (foundCart.total + parseFloat(req.body.priceValue)).toFixed(2);
+      foundCart.save((err)=>{
+        if(err) return next(err);
+        return res.redirect('/cart');
+      });
+    });
+});
+
+router.get('/cart', (req,res,next)=>{
+  let c = Cart
+  .findOne({owner: req.user._id})
+  .populate('items.item');
+  c.exec((err, foundCart)=>{
+    if(err) return next(err);
+    res.render('main/cart', {
+      foundCart: foundCart,
+      title: "Your Clonie shopping cart",
+      errors: req.flash('error'),
+      messages: req.flash('message'),
+      successes: req.flash('success')
+    });
+  });
+});
+
+router.post('/remove', (req,res,next)=>{
+  Cart.findOne({owner: req.user._id}, (err, foundCart)=>{
+    if(err) return next(err);
+    foundCart.items.pull(String(req.body.item));
+    foundCart.total = (foundCart.total - parseFloat(req.body.price)).toFixed(2);
+    foundCart.save((err)=>{
+      if(err) return next(err);
+      req.flash('success', "Removed item from cart");
+      res.redirect('/cart');
     });
   });
 });

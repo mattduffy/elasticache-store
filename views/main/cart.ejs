@@ -1,0 +1,66 @@
+<%- layout('layout') %>
+<div class="container">
+  <div class="row">
+    <div class="col-lg-6">
+      <% if(successes.length > 0) { %>
+        <div class="alert alert-success alert-dismissible">
+          <button type=button class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <%= successes %>
+        </div>
+      <% } %>
+      <% if(messages.length > 0) { %>
+        <div class="alert alert-success alert-dismissible">
+          <button type=button class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <%= messages %>
+        </div>
+      <% } %>
+      <% if(errors.length > 0) { %>
+        <div class="alert alert-danger alert-dismissible">
+          <button type=button class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <%= errors %>
+        </div>
+      <% } %>
+
+
+        <div class="list-group">
+          <% for(var i=0; i< foundCart.items.length; i++) { %>
+          <span class="list-group-item">
+            <div class="row">
+              <div class="col-md-3">
+                <span><img class="product-image" src="<%= foundCart.items[i].item.image %>"></span>
+              </div>
+
+              <div class="col-md-6">
+                <p class="list-group-item-heading"><%= foundCart.items[i].item.name %></p>
+              </div>
+              <div class="col-md-3">
+                <p><%= foundCart.items[i].quantity %></p>
+                <p><%= foundCart.items[i].price %></p>
+
+                <form action="/remove" method="post">
+                  <input type="hidden" name="item" value="<%= foundCart.items[i]._id %>">
+                  <input type="hidden" name="price" value="<%= foundCart.items[i].price %>">
+                  <button type="submit" class="btn">Remove</button>
+                </form>
+
+              </div>
+            </div>
+          </span>
+          <% } %>
+        </div>
+
+    </div>
+    <div class="col-lg-3">
+
+    </div>
+    <div class="col-lg-3">
+
+    </div>
+  </div>
+</div>
