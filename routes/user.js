@@ -60,7 +60,8 @@ router.get('/profile', (req, res, next)=>{
         app: app,
         title: "My Clonie Profile",
         errors: req.flash('loginMessages'),
-        successes: req.flash('success')
+        successes: req.flash('success'),
+        messages: req.flash('message')
       });
     });
   }

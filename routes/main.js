@@ -3,6 +3,8 @@ const router = require('express').Router()
   , Category = require('../models/category')
   , Product = require('../models/product')
   , Cart = require('../models/cart')
+  , cfg = require('../config')
+  , stripe = require('stripe')(cfg.StripeTestSecretKey)
   ;
 
 Product.createMapping((err, mapping)=>{
@@ -170,6 +172,23 @@ router.post('/remove', (req,res,next)=>{
       res.redirect('/cart');
     });
   });
+});
+
+router.post('/payment',(req,res,next)=>{
+  console.log(req.body);
+  let stripeToken = req.body.stripeToken;
+  let currentCharges = Math.round(req.body.stripeMoney *100);
+  stripe.customers.create({
+    source: stripeToken
+  }).then((customer)=>{
+    return stripe.charges.create({
+      customer: customer.id,
+      currency: 'usd',
+      amount: currentCharges
+    });
+  });
+  req.flash('message', "You done boughtenatron'd da stuff.");
+  res.redirect('/profile');
 });
 
 router.get('/category', (req,res,next)=>{
