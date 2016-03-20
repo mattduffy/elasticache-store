@@ -189,11 +189,11 @@ router.post('/payment',(req,res,next)=>{
     });
   }).then((charge)=>{
     async.waterfall([
-      (callback)=>P{
+      (callback)=>{
         req.flash('message', "You done boughtenatron'd da stuff.");
       },
-      (callback)=>P{},
-      (callback)=>P{}
+      (callback)=>{},
+      (callback)=>{}
     ])
   });
 
