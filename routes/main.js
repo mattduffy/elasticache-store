@@ -5,6 +5,7 @@ const router = require('express').Router()
   , Cart = require('../models/cart')
   , cfg = require('../config')
   , stripe = require('stripe')(cfg.StripeTestSecretKey)
+  , async = require('async')
   ;
 
 Product.createMapping((err, mapping)=>{
@@ -186,9 +187,16 @@ router.post('/payment',(req,res,next)=>{
       currency: 'usd',
       amount: currentCharges
     });
+  }).then((charge)=>{
+    async.waterfall([
+      (callback)=>P{
+        req.flash('message', "You done boughtenatron'd da stuff.");
+      },
+      (callback)=>P{},
+      (callback)=>P{}
+    ])
   });
-  req.flash('message', "You done boughtenatron'd da stuff.");
-  res.redirect('/profile');
+
 });
 
 router.get('/category', (req,res,next)=>{
