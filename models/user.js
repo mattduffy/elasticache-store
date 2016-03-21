@@ -1,7 +1,7 @@
 'use strict';
 const mongoose = require('mongoose')
   , Schema = mongoose.Schema
-, bcrypt = require('bcrypt-nodejs')
+  , bcrypt = require('bcrypt-nodejs')
   , crypto = require('crypto')
   ;
 

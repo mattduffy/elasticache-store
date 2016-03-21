@@ -1,5 +1,6 @@
 'use strict';
 const router = require('express').Router()
+  , User = require('../models/user')
   , Category = require('../models/category')
   , Product = require('../models/product')
   , Cart = require('../models/cart')
@@ -190,10 +191,38 @@ router.post('/payment',(req,res,next)=>{
   }).then((charge)=>{
     async.waterfall([
       (callback)=>{
-        req.flash('message', "You done boughtenatron'd da stuff.");
+        req.flash('message', "You done boughtenatron'd da stuff.  ");
+        Cart.findOne({owner: req.user._id}, (err, foundCart)=>{
+          callback(err,foundCart);
+        });
       },
-      (callback)=>{},
-      (callback)=>{}
+      (cart, callback)=>{
+        User.findOne({_id: req.user._id}, (err,foundUser)=>{
+          if(foundUser) {
+            for(var i=0; i<cart.items.length; i++){
+              cart.history.push({
+                item: cart.items[i].item,
+                paid: cart.items[i].price
+              });
+            }
+            foundUser.save((err)=>{
+              if(err) return next(err);
+              callback(err,foundUser);
+            });
+          }
+        })
+      },
+      (user)=>{
+        Cart.update({owner: user._id}, {$set: {items: [], total: 0}}, (err, updated)=>{
+          if(err) return next(err);
+          if(updated){
+            req.flash('message', "Your cart has been emptied.  ");
+          } else {
+            req.flash('error', "Boo.  Your cart wasn't emptied for some reason.");
+          }
+          res.redirect('/profile');
+        });
+      }
     ])
   });
 

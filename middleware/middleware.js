@@ -12,11 +12,20 @@ module.exports = (req,res,next)=>{
         }
         res.locals.cart = total;
       } else {
-        re.locals.cart = 0;
+        let cart = new Cart();
+        cart.owner = req.user._id;
+        cart.save((err)=>{
+          if(err) {
+            req.flash('The universe does not want you to have a shopping cart.');
+            return next(err);
+          }
+        });
+        res.locals.cart = total;
       }
-      next();
     });
+    next();
   } else {
+    req.flash('error', "You do not exist.");
     next();
   }
 };
