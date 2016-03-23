@@ -5,6 +5,7 @@ const router = require('express').Router()
   , passportCfg = require('../config/passport')
   , async = require('async')
   , Cart = require('../models/cart.js')
+  , util = require('util')
   ;
 
 router.get('/signup', (req, res, next)=>{
@@ -50,22 +51,46 @@ router.post('/signup', (req, res, next)=>{
   ]);
 });
 
-router.get('/profile', (req, res, next)=>{
-  if (req.user) {
-    let app = req.app.locals.app;
-    User.findOne({_id: req.user._id}, (err, found)=>{
+router.get('/test', (req,res,next)=>{
+  console.log(util.inspect(passportCfg.isAuthenticated, {showHidden: true, depth: null, colors: true}));
+  console.log(util.inspect(req.isAuthenticated, {showHidden: true, depth: null, colors: true}));
+  return res.json({"samesies": (passportCfg.isAuthenticated == req.isAuthenticated)});
+});
+
+router.get('/profile', passportCfg.isAuthenticated, (req,res,next)=>{
+  let u = User
+    .findOne({_id: req.user._id})
+    .populate('history.item');
+    u.exec((err, foundUser)=>{
       if(err) return next(err);
+      let app = req.app.locals.app;
       res.render('accounts/profile', {
-        user: found,
+        title: "Your Clonie profile",
+        user: foundUser,
         app: app,
-        title: "My Clonie Profile",
         errors: req.flash('loginMessages'),
         successes: req.flash('success'),
         messages: req.flash('message')
       });
     });
-  }
 });
+
+// router.get('/profile', (req, res, next)=>{
+//   if (req.user) {
+//     let app = req.app.locals.app;
+//     User.findOne({_id: req.user._id}, (err, found)=>{
+//       if(err) return next(err);
+//       res.render('accounts/profile', {
+//         user: found,
+//         app: app,
+//         title: "My Clonie Profile",
+//         errors: req.flash('loginMessages'),
+//         successes: req.flash('success'),
+//         messages: req.flash('message')
+//       });
+//     });
+//   }
+// });
 
 router.get('/login', (req, res, next)=>{
   if(req.user) {
