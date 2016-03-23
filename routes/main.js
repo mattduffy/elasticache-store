@@ -199,8 +199,8 @@ router.post('/payment',(req,res,next)=>{
       (cart, callback)=>{
         User.findOne({_id: req.user._id}, (err,foundUser)=>{
           if(foundUser) {
-            for(var i=0; i<cart.items.length; i++){
-              cart.history.push({
+            for(var i=0; i < cart.items.length; i++){
+              foundUser.history.push({
                 item: cart.items[i].item,
                 paid: cart.items[i].price
               });

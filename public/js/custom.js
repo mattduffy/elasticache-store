@@ -1,4 +1,28 @@
 $(function(){
+  var opts = {
+    lines: 13 // The number of lines to draw
+  , length: 28 // The length of each line
+  , width: 14 // The line thickness
+  , radius: 42 // The radius of the inner circle
+  , scale: 1 // Scales overall size of the spinner
+  , corners: 1 // Corner roundness (0..1)
+  , color: '#000' // #rgb or #rrggbb or array of colors
+  , opacity: 0.25 // Opacity of the lines
+  , rotate: 0 // The rotation offset
+  , direction: 1 // 1: clockwise, -1: counterclockwise
+  , speed: 1 // Rounds per second
+  , trail: 60 // Afterglow percentage
+  , fps: 20 // Frames per second when using setTimeout() as a fallback for CSS
+  , zIndex: 2e9 // The z-index (defaults to 2000000000)
+  , className: 'spinner' // The CSS class to assign to the spinner
+  , top: '50%' // Top position relative to parent
+  , left: '50%' // Left position relative to parent
+  , shadow: false // Whether to render a shadow
+  , hwaccel: false // Whether to use hardware acceleration
+  , position: 'absolute' // Element positioning
+  }
+  // var target = document.getElementById('foo')
+  // var spinner = new Spinner(opts).spin(target);
 
   $('#search').keyup(function(e){
     var search_term = $(this).val();
@@ -86,121 +110,11 @@ $(function(){
       // Insert the token into the form so it gets submitted to the server
       $form.append($('<input type="hidden" name="stripeToken" />').val(token));
       // and submit
+      var spinner = new Spinner(opts).spin();
+      $('#loading').append(spinner.el);
       $form.get(0).submit();
     }
   };
 
-  //var $form = $('#payment-form');
-  //$form.on('submit', payWithStripe);
-
-  /* If you're using Stripe for payments */
-  // function payWithStripe(e) {
-  //     e.preventDefault();
-  //
-  //     /* Visual feedback */
-  //     $form.find('[type=submit]').html('Validating <i class="fa fa-spinner fa-pulse"></i>');
-  //
-  //     var PublishableKey = 'pk_test_TxRnauTMocqLmGm2KSakml7N'; // Replace with your API publishable key
-  //     Stripe.setPublishableKey(PublishableKey);
-  //     //Stripe.card.createToken($form, function stripeResponseHandler(status, response) {
-  //     Stripe.card.createToken($form, function stripeResponseHandler(status, response) {
-  //         console.log("createToken res: ", response);
-  //         if (response.error) {
-  //             /* Visual feedback */
-  //             $form.find('[type=submit]').html('Try again');
-  //             /* Show Stripe errors on the form */
-  //             $form.find('.payment-errors').text(response.error.message);
-  //             $form.find('.payment-errors').closest('.row').show();
-  //         } else {
-  //             /* Visual feedback */
-  //             $form.find('[type=submit]').html('Processing <i class="fa fa-spinner fa-pulse"></i>');
-  //             /* Hide Stripe errors on the form */
-  //             $form.find('.payment-errors').closest('.row').hide();
-  //             $form.find('.payment-errors').text("");
-  //             // response contains id and card, which contains additional card details
-  //             var token = response.id;
-  //             console.log(token);
-  //             // AJAX
-  //             $.post('/account/stripe_card_token', {
-  //             //$.post('/payment', {
-  //                     token: token,
-  //                     stripeToken: token,
-  //                     stripeMoney: $form.find('input[name="stripeMoney"][type="hidden"]').val()
-  //                 })
-  //                 // Assign handlers immediately after making the request,
-  //                 .done(function(data, textStatus, jqXHR) {
-  //                     $form.find('[type=submit]').html('Payment successful <i class="fa fa-check"></i>').prop('disabled', true);
-  //                 })
-  //                 .fail(function(jqXHR, textStatus, errorThrown) {
-  //                   console.log("fail: ", errorThrown);
-  //                   console.log('stripe error: ', textStatus);
-  //                     $form.find('[type=submit]').html('There was a problem').removeClass('success').addClass('error');
-  //                     /* Show Stripe errors on the form */
-  //                     $form.find('.payment-errors').text('Try refreshing the page and trying again.');
-  //                     $form.find('.payment-errors').closest('.row').show();
-  //                 });
-  //         }
-  //     });
-  // }
-
-  // /* Form validation */
-  // jQuery.validator.addMethod("month", function(value, element) {
-  //   return this.optional(element) || /^(01|02|03|04|05|06|07|08|09|10|11|12)$/.test(value);
-  // }, "Please specify a valid 2-digit month.");
-  //
-  // jQuery.validator.addMethod("year", function(value, element) {
-  //   return this.optional(element) || /^[0-9]{2}$/.test(value);
-  // }, "Please specify a valid 2-digit year.");
-  //
-  // validator = $form.validate({
-  //     rules: {
-  //         cardNumber: {
-  //             required: true,
-  //             creditcard: true,
-  //             digits: true
-  //         },
-  //         expMonth: {
-  //             required: true,
-  //             month: true
-  //         },
-  //         expYear: {
-  //             required: true,
-  //             year: true
-  //         },
-  //         cvCode: {
-  //             required: true,
-  //             digits: true
-  //         }
-  //     },
-  //     highlight: function(element) {
-  //         $(element).closest('.form-control').removeClass('success').addClass('error');
-  //     },
-  //     unhighlight: function(element) {
-  //         $(element).closest('.form-control').removeClass('error').addClass('success');
-  //     },
-  //     errorPlacement: function(error, element) {
-  //         $(element).closest('.form-group').append(error);
-  //     }
-  // });
-  //
-  // paymentFormReady = function() {
-  //     if ($form.find('[name=cardNumber]').hasClass("success") &&
-  //         $form.find('[name=expMonth]').hasClass("success") &&
-  //         $form.find('[name=expYear]').hasClass("success") &&
-  //         $form.find('[name=cvCode]').val().length > 1) {
-  //         return true;
-  //     } else {
-  //         return false;
-  //     }
-  // }
-  //
-  // $form.find('[type=submit]').prop('disabled', true);
-  // var readyInterval = setInterval(function() {
-  //     if (paymentFormReady()) {
-  //         $form.find('[type=submit]').prop('disabled', false);
-  //         clearInterval(readyInterval);
-  //     }
-  // }, 250);
-
-
+  ///
 });
