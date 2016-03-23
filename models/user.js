@@ -13,6 +13,8 @@ var UserSchema = new mongoose.Schema({
     name: {type: String, default: ''},
     picture: {type: String, default: ''}
   },
+  facebook: String,
+  tokens: Array,
   address: String,
   history: [{
     date: Date,

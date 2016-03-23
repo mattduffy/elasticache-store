@@ -114,6 +114,13 @@ router.post('/login', (req, res, next)=>{
   failureFlash: true
 }));
 
+router.get('/auth/facebook', passport.authenticate('facebook-login',{scope: 'email'}));
+
+router.get('/auth/facebook/callback', passport.authenticate('facebook-login', {
+  successRedirect: '/profile',
+  failureRedirect: '/login'
+}));
+
 router.get('/logout', (req, res, next)=>{
   req.logout();
   // req.cart = null;

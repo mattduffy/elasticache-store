@@ -1,6 +1,8 @@
 'use strict';
 const passport = require('passport')
   , localStrategy = require('passport-local').Strategy
+  , facebookStrategy = require('passport-facebook').Strategy
+  , cfg = require('../config/')
   , User = require('../models/user')
   ;
 
@@ -13,7 +15,7 @@ passport.deserializeUser((id, done)=>{
     done(err, user);
   });
 });
-// middleware
+// local auth strategy middleware
 passport.use('local-login', new localStrategy({
   usernameField: "email",
   passwordField: "password",
@@ -34,6 +36,32 @@ passport.use('local-login', new localStrategy({
   })
 );
 
+// facebook auth strategy middleware
+passport.use('facebook-login', new facebookStrategy({
+  clientID: cfg.FacebookAppID,
+  clientSecret: cfg.FacebookAppSecret,
+  profileFields: ['emails', 'displayName'],
+  callbackURL: cfg.FacebookCallbackUrl
+  },(token, refreshToken, profile, done)=>{
+    User.findOne({facebook: profile.id}, (err, foundUser)=>{
+      if(err) return done(err);
+      if(foundUser) {
+        return done(null, foundUser);
+      } else {
+        let newUser = new User();
+        newUser.email = profile._json.email;
+        newUser.facebook = profile.id;
+        newUser.tokens.push({kind: 'facebook', token: token});
+        newUser.profile.name = profile.displayName;
+        newUser.profile.picture = "https://graph.facebook.com/"+profile.id+"/picture?type=large";
+        newUser.save((err)=>{
+          if(err) return done(err);
+          return done(null, newUser);
+        });
+      }
+    })
+  }
+));
 // custom function to validate
 exports.isAuthenticated = (req, res, next)=>{
   if (req.isAuthenticated()) {
